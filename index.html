@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flex — Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --purple:#6C5DD3;
+    --purple-dark:#584AC7;
+    --purple-light:#EFECFB;
+    --purple-softline:#E4DFF9;
+    --green:#1DBF73;
+    --yellow:#FDB022;
+    --page-bg:#EDEDF4;
+    --panel-bg:#F5F5FA;
+    --card:#FFFFFF;
+    --text-dark:#1D1B39;
+    --text-muted:#9A9CB0;
+    --text-faint:#B9BBCB;
+    --border:#EFEFF5;
+    --red:#F65164;
+    shape-rendering:geometricPrecision;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--page-bg);
+    padding:28px 16px;
+    color:var(--text-dark);
+    -webkit-font-smoothing:antialiased;
+  }
+  .dashboard{
+    max-width:1060px;
+    margin:0 auto;
+    background:var(--panel-bg);
+    border-radius:30px;
+    padding:22px;
+    display:flex;
+    gap:22px;
+    box-shadow:0 30px 60px -20px rgba(30,20,80,0.12);
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:210px;
+    flex-shrink:0;
+    padding:6px 10px 6px 4px;
+    display:flex;
+    flex-direction:column;
+    background:#fff;
+    border-radius:22px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:28px;
+  }
+  .brand .hex{
+    width:34px;height:34px;
+    background:var(--yellow);
+    clip-path:polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0% 50%);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:16px;
+  }
+  .brand span{font-size:19px;font-weight:700;letter-spacing:-0.02em;}
+
+  .menu-label{
+    font-size:11px;color:var(--text-faint);
+    letter-spacing:.01em;
+    margin:4px 0 10px 10px;font-weight:600;
+  }
+  nav.mainnav{display:flex;flex-direction:column;gap:5px;margin-bottom:24px;}
+  .navitem{
+    display:flex;align-items:center;gap:10px;
+    min-height:42px;padding:10px 13px;border-radius:13px;
+    color:#2D2A4B;font-size:14.5px;font-weight:600;
+    cursor:default;
+  }
+  .navitem svg{width:17px;height:17px;flex-shrink:0;}
+  .navitem .chev{margin-left:auto;width:13px;height:13px;opacity:.6;}
+  .navitem.active{
+    background:linear-gradient(100deg,#4F4CFA 0%,#6251ED 55%,#6C4DDD 100%);
+    color:#fff;
+    box-shadow:0 12px 22px -9px rgba(79,76,250,.62);
+  }
+  .navitem .badge{
+    margin-left:auto;background:var(--green);color:#fff;
+    font-size:11px;font-weight:700;border-radius:20px;
+    padding:2px 7px;
+  }
+
+  .integrations{display:flex;flex-direction:column;gap:14px;margin-bottom:auto;}
+  .integration{display:flex;align-items:center;gap:10px;padding:0 12px;font-size:14px;color:#5B5975;font-weight:500;}
+  .integration .dot{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .integration .dot svg{width:13px;height:13px;}
+
+  .logout{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#5B5975;font-size:14.5px;font-weight:500;margin-top:20px;}
+  .logout svg{width:17px;height:17px;}
+
+  /* ---------- MAIN ---------- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;}
+
+  .topbar{display:flex;align-items:center;gap:14px;}
+  .iconbtn{
+    width:38px;height:38px;border-radius:12px;background:var(--card);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    border:1px solid var(--border);
+  }
+  .iconbtn svg{width:15px;height:15px;color:#8A8CA0;}
+  .searchbar{
+    flex:1;background:var(--card);border-radius:14px;
+    display:flex;align-items:center;gap:10px;
+    padding:11px 16px;border:1px solid var(--border);
+    color:var(--text-muted);font-size:14px;
+  }
+  .searchbar svg{width:15px;height:15px;color:var(--text-faint);}
+
+  .topbar .spacer{flex-shrink:0;}
+  .bell{position:relative;}
+  .bell::after{
+    content:"";position:absolute;top:9px;right:10px;
+    width:6px;height:6px;background:var(--red);border-radius:50%;
+    border:1.5px solid var(--card);
+  }
+  .balance{display:flex;flex-direction:column;line-height:1.25;flex-shrink:0;white-space:nowrap;}
+  .balance .lbl{font-size:11px;color:var(--text-muted);}
+  .balance .amt{font-size:14.5px;font-weight:700;color:var(--purple);}
+  .userchip{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(145deg,#F7A568,#E86D45);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    overflow:hidden;
+    box-shadow:0 4px 10px -2px rgba(232,101,74,.5);
+  }
+  .avatar .portrait{font-size:25px;line-height:1;transform:translateY(3px);}
+  .userchip .hi{font-size:14px;font-weight:600;white-space:nowrap;}
+
+  .pageheader{display:flex;align-items:center;gap:14px;}
+  .pageheader .hicon{
+    width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#4F4CFA,#4237B8);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    box-shadow:0 9px 18px -8px rgba(79,76,250,.65);
+  }
+  .pageheader .hicon svg{width:16px;height:16px;color:#fff;}
+  .pageheader h1{font-size:20px;font-weight:700;letter-spacing:-0.01em;}
+  .pageheader .push{flex:1;}
+  .pill{
+    display:flex;align-items:center;gap:8px;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:9px 14px;font-size:13.5px;font-weight:500;color:#5B5975;
+    white-space:nowrap;
+  }
+  .pill svg{width:14px;height:14px;color:var(--text-muted);}
+  .pill .chev{width:11px;height:11px;margin-left:2px;opacity:.6;}
+  .btn-green{
+    display:flex;align-items:center;gap:8px;
+    background:var(--green);color:#fff;border:none;
+    border-radius:12px;padding:10px 16px;font-size:13.5px;font-weight:600;
+    box-shadow:0 10px 20px -8px rgba(29,191,115,.6);white-space:nowrap;
+  }
+  .btn-green svg{width:14px;height:14px;}
+
+  /* ---------- STAT CARDS ---------- */
+  .statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  .statcard{
+    background:var(--card);border-radius:18px;padding:17px 18px;
+    display:flex;align-items:center;gap:13px;border:1px solid var(--border);
+  }
+  .statcard .icn{
+    width:46px;height:46px;border-radius:14px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .statcard .icn svg{width:20px;height:20px;color:#5650EF;}
+  .statcard .icn.orange,.statcard .icn.purple,.statcard .icn.dark{background:linear-gradient(145deg,#F2EFFF,#E7E4FF);}
+  .statcard .lbl{font-size:12.5px;color:var(--text-muted);margin-bottom:4px;}
+  .statcard .row{display:flex;align-items:baseline;gap:8px;}
+  .statcard .num{font-size:21px;font-weight:800;letter-spacing:-0.01em;}
+  .statcard .chg{font-size:12px;font-weight:700;display:flex;align-items:center;gap:2px;}
+  .chg.up{color:var(--green);}
+  .chg.down{color:var(--red);}
+  .chg svg{width:9px;height:9px;}
+
+  /* ---------- CONTENT GRID ---------- */
+  .contentgrid{display:grid;grid-template-columns:1.62fr 1fr;gap:18px;align-items:start;}
+  .card{background:var(--card);border-radius:20px;padding:20px 22px;border:1px solid var(--border);}
+
+  .sessions-card .chead{display:flex;align-items:center;margin-bottom:18px;}
+  .sessions-card .chead h3{font-size:16px;font-weight:700;}
+  .sessions-card .chead .push{flex:1;}
+  .btn-outline{
+    background:var(--panel-bg);border:1px solid var(--border);
+    border-radius:10px;padding:7px 14px;font-size:12.5px;font-weight:600;color:#5B5975;
+  }
+
+  .visitors-row{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .visitors-row .icn{
+    width:42px;height:42px;border-radius:12px;background:var(--purple-light);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .visitors-row .icn svg{width:18px;height:18px;color:var(--purple);}
+  .visitors-row .txt .lbl{font-size:12.5px;color:var(--text-muted);margin-bottom:2px;}
+  .visitors-row .txt .num{font-size:22px;font-weight:800;}
+  .visitors-row .push{flex:1;}
+  .visitors-row .stats{display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:12.5px;font-weight:700;}
+  .visitors-row .stats .row2{display:flex;align-items:center;gap:6px;color:var(--text-muted);font-weight:600;}
+
+  .chart-subhead{display:flex;align-items:center;margin-bottom:6px;}
+  .chart-subhead h4{font-size:14px;font-weight:700;}
+  .chart-subhead .push{flex:1;}
+
+  .chartwrap{display:flex;gap:10px;margin-top:8px;}
+  .yaxis{display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:var(--text-faint);padding:4px 0 0;}
+
+  .dayrow{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;}
+  .dayrow .arrow{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-faint);flex-shrink:0;}
+  .dayrow .arrow svg{width:10px;height:10px;}
+  .dayrow .day{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#8B8DA0;}
+  .dayrow .day.active{background:linear-gradient(145deg,#4F4CFA,#6C4DDD);color:#fff;font-weight:700;box-shadow:0 10px 18px -7px rgba(79,76,250,.65);}
+
+  .rightcol{display:flex;flex-direction:column;gap:18px;}
+
+  .promo-card{
+    border-radius:20px;padding:22px;position:relative;overflow:hidden;
+    background:linear-gradient(150deg,#7A6CE0,#5C4EDB 60%,#4E3FCF);
+    color:#fff;min-height:172px;
+  }
+  .promo-card h3{font-size:16px;font-weight:700;margin-bottom:6px;max-width:170px;}
+  .promo-card p{font-size:12.5px;color:#DCD7F8;max-width:160px;line-height:1.45;margin-bottom:16px;}
+  .btn-white{
+    background:#fff;color:var(--purple-dark);border:none;border-radius:10px;
+    padding:9px 14px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:7px;
+  }
+  .btn-white svg{width:13px;height:13px;}
+  .promo-deco{position:absolute;right:14px;bottom:10px;opacity:.9;}
+
+  .conv-card h3{font-size:16px;font-weight:700;margin-bottom:6px;}
+  .gaugewrap{display:flex;flex-direction:column;align-items:center;padding:6px 0 4px;}
+  .gauge-num{font-size:27px;font-weight:800;margin-top:-57px;letter-spacing:-.02em;}
+  .gauge-chg{font-size:12px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:3px;margin-top:2px;}
+  .gauge-chg svg{width:9px;height:9px;}
+
+  .conv-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:14px;border-top:1px solid var(--border);}
+  .conv-footer .item{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:#5B5975;}
+  .conv-footer .item svg{width:12px;height:12px;}
+  .conv-footer .item.income svg{color:var(--green);}
+  .conv-footer .item.expenses svg{color:var(--red);}
+  .conv-footer .item b{font-weight:800;color:var(--text-dark);}
+
+  @media(max-width:880px){
+    .dashboard{flex-direction:column;}
+    .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;}
+    .contentgrid{grid-template-columns:1fr;}
+    .statrow{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="hex">R</div>
+      <span>flex</span>
+    </div>
+
+    <div class="menu-label">Menu</div>
+    <nav class="mainnav">
+      <div class="navitem active">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.4 10.5 11 3.9a1.5 1.5 0 0 1 2 0l7.6 6.6a1.2 1.2 0 0 1-.8 2.1h-.7v6.2a2 2 0 0 1-2 2h-3.2v-5.2h-3.8v5.2H6.9a2 2 0 0 1-2-2v-6.2h-.7a1.2 1.2 0 0 1-.8-2.1Z"/></svg>
+        Dashboard
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 7V6a4 4 0 0 1 8 0v1h1.7a2.3 2.3 0 0 1 2.3 2.3v9.4a2.3 2.3 0 0 1-2.3 2.3H6.3A2.3 2.3 0 0 1 4 18.7V9.3A2.3 2.3 0 0 1 6.3 7H8Zm2 0h4V6a2 2 0 1 0-4 0v1Z" clip-rule="evenodd"/></svg>
+        Orders
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 6 6 6-6 6"/></svg>
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m11.1 2.5-7 3.5a1.5 1.5 0 0 0 0 2.7l7 3.5a2 2 0 0 0 1.8 0l7-3.5a1.5 1.5 0 0 0 0-2.7l-7-3.5a2 2 0 0 0-1.8 0Z"/><path d="m3.6 11.2 7.5 3.7a2 2 0 0 0 1.8 0l7.5-3.7a1.5 1.5 0 0 1-.5 2.6l-7 3.5a2 2 0 0 1-1.8 0l-7-3.5a1.5 1.5 0 0 1-.5-2.6Z"/><path d="m3.6 16.1 7.5 3.8a2 2 0 0 0 1.8 0l7.5-3.8a1.5 1.5 0 0 1-.5 2.7l-7 3.5a2 2 0 0 1-1.8 0l-7-3.5a1.5 1.5 0 0 1-.5-2.7Z"/></svg>
+        Products
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 6 6 6-6 6"/></svg>
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="11" width="4" height="10" rx="1.3"/><rect x="10" y="4" width="4" height="17" rx="1.3"/><rect x="17" y="8" width="4" height="13" rx="1.3"/></svg>
+        Analytics
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9.5v5A2.5 2.5 0 0 0 5.5 17H7l2.2 4h3l-2.1-4H12l7.2 3.2a1.3 1.3 0 0 0 1.8-1.2V5a1.3 1.3 0 0 0-1.8-1.2L10 8H5.5A2.5 2.5 0 0 0 3 10.5v-1Z"/></svg>
+        Marketing
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 6 6 6-6 6"/></svg>
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.8 3 3 6.5 3 11c0 2.2.9 4.2 2.5 5.6L4 20.8a.7.7 0 0 0 .9.9l4.6-2.1c.8.2 1.6.4 2.5.4 5.2 0 9-3.5 9-8.5S17.2 3 12 3Zm-3.5 10a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm3.5 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm3.5 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Z"/></svg>
+        Messages
+        <span class="badge">25</span>
+      </div>
+    </nav>
+
+    <div class="menu-label">Integrations</div>
+    <div class="integrations">
+      <div class="integration">
+        <div class="dot" style="background:#E9EEFF;">
+          <svg viewBox="0 0 24 24"><path fill="#2684FF" d="M11.53 2 2 11.53a1 1 0 0 0 0 1.41l3.06 3.06 6.47-6.47L18 3.06 15.47 0.53a1 1 0 0 0-1.41 0Z" transform="translate(2 2)"/></svg>
+        </div>
+        Jira
+      </div>
+      <div class="integration">
+        <div class="dot" style="background:#F1EBFF;">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="6" rx="2" fill="#36C5F0"/><rect x="16" y="9" width="6" height="6" rx="2" fill="#2EB67D"/><rect x="9" y="16" width="6" height="6" rx="2" fill="#ECB22E"/><rect x="2" y="9" width="6" height="6" rx="2" fill="#E01E5A"/></svg>
+        </div>
+        Slack
+      </div>
+      <div class="integration">
+        <div class="dot" style="background:#E9F0FF;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3E7BFA" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 10v2M12 9v4M16 10v2"/></svg>
+        </div>
+        Intercom
+      </div>
+    </div>
+
+    <div class="logout">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4.7A2.7 2.7 0 0 1 6.7 2h6.6A2.7 2.7 0 0 1 16 4.7V8h-2V4.7a.7.7 0 0 0-.7-.7H6.7a.7.7 0 0 0-.7.7v14.6c0 .4.3.7.7.7h6.6c.4 0 .7-.3.7-.7V16h2v3.3a2.7 2.7 0 0 1-2.7 2.7H6.7A2.7 2.7 0 0 1 4 19.3V4.7Z"/><path d="M19.1 8.2a1 1 0 0 0-1.4 1.4l1.4 1.4H10a1 1 0 1 0 0 2h9.1l-1.4 1.4a1 1 0 1 0 1.4 1.4l3.1-3.1a1 1 0 0 0 0-1.4l-3.1-3.1Z"/></svg>
+      Logout
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <div class="iconbtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 6-6 6 6 6"/></svg>
+      </div>
+      <div class="searchbar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        Search
+      </div>
+      <div class="iconbtn bell">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div class="balance">
+        <span class="lbl">Your Balance</span>
+        <span class="amt">$5.456</span>
+      </div>
+      <div class="userchip">
+        <div class="avatar">
+          <span class="portrait" role="img" aria-label="Lay">👩🏽</span>
+        </div>
+        <span class="hi">Hi, Lay</span>
+      </div>
+    </div>
+
+    <div class="pageheader">
+      <div class="hicon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+      </div>
+      <h1>Dashboard</h1>
+      <div class="push"></div>
+      <div class="pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        This Month
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <button class="btn-green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 16a4 4 0 0 1 .8-7.93A5.5 5.5 0 0 1 18 10a3.5 3.5 0 0 1-1 6.87"/><path d="M12 12v7M9 16l3 3 3-3"/></svg>
+        Download Report
+      </button>
+    </div>
+
+    <div class="statrow">
+      <div class="statcard">
+        <div class="icn orange">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.8 12.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21.5 8H6"/></svg>
+        </div>
+        <div>
+          <div class="lbl">Total Sales</div>
+          <div class="row">
+            <span class="num">263k</span>
+            <span class="chg up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 19V5M5 12l7-7 7 7"/></svg>15.6%</span>
+          </div>
+        </div>
+      </div>
+      <div class="statcard">
+        <div class="icn purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="lbl">Total Visitors</div>
+          <div class="row">
+            <span class="num">35k</span>
+            <span class="chg down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12l7 7 7-7"/></svg>6.2%</span>
+          </div>
+        </div>
+      </div>
+      <div class="statcard">
+        <div class="icn dark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8V6a6 6 0 0 1 12 0v2"/><rect x="4" y="8" width="16" height="13" rx="2"/></svg>
+        </div>
+        <div>
+          <div class="lbl">Total Orders</div>
+          <div class="row">
+            <span class="num">165k</span>
+            <span class="chg up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 19V5M5 12l7-7 7 7"/></svg>3.5%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contentgrid">
+
+      <!-- LEFT: sessions card -->
+      <div class="card sessions-card">
+        <div class="chead">
+          <h3>Online Store Sessions</h3>
+          <div class="push"></div>
+          <button class="btn-outline">View Report</button>
+        </div>
+
+        <div class="visitors-row">
+          <div class="icn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="txt">
+            <div class="lbl">Visitors</div>
+            <div class="num">68</div>
+          </div>
+          <div class="push"></div>
+          <div class="stats">
+            <span class="chg up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 19V5M5 12l7-7 7 7"/></svg>15.6%</span>
+            <span class="row2">26 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:9px;height:9px;color:var(--red)"><path d="M12 5v14M5 12l7 7 7-7"/></svg><span style="color:var(--red)">1.6%</span></span>
+          </div>
+        </div>
+
+        <div class="chart-subhead">
+          <h4>Sessions Over Time</h4>
+          <div class="push"></div>
+          <div class="pill" style="padding:6px 12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+            February
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+
+        <div class="chartwrap">
+          <div class="yaxis" style="height:150px;">
+            <span>15</span><span>10</span><span>5</span><span>0</span>
+          </div>
+          <svg viewBox="0 0 560 150" style="flex:1;overflow:visible;" role="img" aria-label="Sessions over time">
+            <defs>
+              <linearGradient id="sessionLine" x1="0" y1="0" x2="560" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#B9B0FA"/>
+                <stop offset=".48" stop-color="#6F62EA"/>
+                <stop offset="1" stop-color="#4F4CFA"/>
+              </linearGradient>
+              <filter id="sessionGlow" x="-5%" y="-20%" width="110%" height="150%">
+                <feGaussianBlur stdDeviation="2.2" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <line x1="0" y1="0" x2="560" y2="0" stroke="#F0F0F5" stroke-width="1"/>
+            <line x1="0" y1="50" x2="560" y2="50" stroke="#F0F0F5" stroke-width="1"/>
+            <line x1="0" y1="100" x2="560" y2="100" stroke="#F0F0F5" stroke-width="1"/>
+            <line x1="0" y1="149" x2="560" y2="149" stroke="#F0F0F5" stroke-width="1"/>
+            <path d="M0,149 C30,149 40,52 92,49 C145,46 151,141 216,141 C275,141 284,58 337,57 C398,56 407,136 462,130 C510,125 516,2 560,1"
+                  fill="none" stroke="url(#sessionLine)" stroke-width="3.5" stroke-linecap="round" filter="url(#sessionGlow)"/>
+          </svg>
+        </div>
+
+        <div class="dayrow">
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 6-6 6 6 6"/></svg></div>
+          <div class="day">20</div>
+          <div class="day active">21</div>
+          <div class="day">22</div>
+          <div class="day">23</div>
+          <div class="day">24</div>
+          <div class="day">25</div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 6 6 6-6 6"/></svg></div>
+        </div>
+      </div>
+
+      <!-- RIGHT column -->
+      <div class="rightcol">
+        <div class="promo-card">
+          <h3>Need More Stats?</h3>
+          <p>Upgrade to pro for added benefits.</p>
+          <button class="btn-white">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg>
+            Go Pro Now
+          </button>
+          <svg class="promo-deco" width="90" height="90" viewBox="0 0 90 90" fill="none">
+            <path d="M8 82 C 30 70, 35 55, 55 45 C 65 40, 70 30, 74 18" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="2" stroke-dasharray="4 5" fill="none"/>
+            <path d="M74 18 L74 32 M74 18 L60 18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M6 84 C 20 84 26 74 26 66 C 26 74 34 84 46 82" stroke="#fff" stroke-opacity=".5" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+
+        <div class="card conv-card">
+          <h3>Conversion</h3>
+          <div class="gaugewrap">
+            <svg width="220" height="130" viewBox="0 0 220 130" role="img" aria-label="Conversion 58,19 percent">
+              <defs>
+                <linearGradient id="gaugeGradient" x1="20" y1="120" x2="200" y2="30" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#998CF7"/>
+                  <stop offset=".55" stop-color="#675CF1"/>
+                  <stop offset="1" stop-color="#4D46F7"/>
+                </linearGradient>
+                <filter id="gaugeGlow" x="-15%" y="-15%" width="130%" height="140%">
+                  <feGaussianBlur stdDeviation="2" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <path d="M20,120 A90,90 0 0,1 200,120" pathLength="100" fill="none" stroke="#EFECFB" stroke-width="28" stroke-linecap="round"/>
+              <path d="M20,120 A90,90 0 0,1 200,120" pathLength="100" fill="none" stroke="url(#gaugeGradient)" stroke-width="28" stroke-linecap="round"
+                    stroke-dasharray="76 100" filter="url(#gaugeGlow)"/>
+              <path d="M176,58 L198,81" fill="none" stroke="#5650EF" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+            </svg>
+            <div class="gauge-num">58,19%</div>
+            <div class="gauge-chg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 19V5M5 12l7-7 7 7"/></svg>3.5%</div>
+          </div>
+          <div class="conv-footer">
+            <div class="item income">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+              Income <b>$542,317</b>
+            </div>
+            <div class="item expenses">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              Expenses <b>$497,456</b>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</body>
+</html>
